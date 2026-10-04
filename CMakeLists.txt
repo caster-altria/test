@@ -50,6 +50,14 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
 
     applications/led_task.cpp 
     sp_middleware/io/led/led.cpp # LED
+
+    applications/imu_task.cpp 
+    sp_middleware/io/bmi088/bmi088.cpp  
+    sp_middleware/tools/mahony/mahony.cpp   
+    sp_middleware/tools/gimbal/gimbal.cpp # imu 
+
+    applications/plotter_task.cpp 
+    sp_middleware/io/plotter/plotter.cpp # plotter
 )
 
 # Add include paths
