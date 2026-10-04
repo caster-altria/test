@@ -58,6 +58,9 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
 
     applications/plotter_task.cpp 
     sp_middleware/io/plotter/plotter.cpp # plotter
+
+    applications/uart_task.cpp 
+    sp_middleware/io/dbus/dbus.cpp # dbus
 )
 
 # Add include paths
