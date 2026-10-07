@@ -65,6 +65,11 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     applications/can_task.cpp 
     sp_middleware/io/can/can.cpp 
     sp_middleware/motor/rm_motor/rm_motor.cpp # can
+
+    applications/linkage_task.cpp
+    sp_middleware/tools/linkage_controller/linkage_controller.cpp
+    sp_middleware/tools/pid/pid.cpp
+    sp_middleware/tools/math_tools/math_tools.cpp # linkage
 )
 
 # Add include paths
