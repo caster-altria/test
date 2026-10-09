@@ -31,8 +31,11 @@ int LinkageController::find_manual_axis(
   const bool a_is_dominant = std::abs(delta_a_rad) >= std::abs(delta_b_rad);
   const bool b_is_dominant = std::abs(delta_b_rad) > std::abs(delta_a_rad);
 
-  if (a_is_moving && a_is_off_target && a_is_dominant) return 1;
-  if (b_is_moving && b_is_off_target && b_is_dominant) return -1;
+  const bool a_is_pulled = (error_a_rad * delta_a_rad) > 0.0f;
+  const bool b_is_pulled = (error_b_rad * delta_b_rad) > 0.0f;
+
+  if (a_is_moving && a_is_pulled && a_is_off_target && a_is_dominant) return 1;
+  if (b_is_moving && b_is_pulled && b_is_off_target && b_is_dominant) return -1;
   return 0;
 }
 
@@ -48,15 +51,15 @@ LinkageController::LinkageController(RM_Motor & motor_a, RM_Motor & motor_b)
   pid_a_(
     CONTROL_PERIOD_S, LOOP_KP, LOOP_KI, LOOP_KD, LOOP_MAX_TORQUE_NM, LOOP_MAX_INTEGRAL_NM,
     LOOP_D_FILTER_ALPHA,
-    true,   // angular = true, 由 sp::PID 内部用 limit_angle 处理 ±pi 跳变
-    false   // dynamic = false
+    true,  // angular = true, 由 sp::PID 内部用 limit_angle 处理 ±pi 跳变
+    false  // dynamic = false
     ),
   pid_b_(
     CONTROL_PERIOD_S, LOOP_KP, LOOP_KI, LOOP_KD, LOOP_MAX_TORQUE_NM, LOOP_MAX_INTEGRAL_NM,
     LOOP_D_FILTER_ALPHA,
-    true,   // angular = true
-    false   // dynamic = false
-    )
+    true,  // angular = true
+    false  // dynamic = false
+  )
 {
 }
 
@@ -179,8 +182,8 @@ void LinkageController::update(
   else {
     // C 板静止: 才可能有人手转电机
     if (this->mode_ == Mode::NORMAL) {
-      const int manual_axis = this->find_manual_axis(
-        delta_a_rad, delta_b_rad, error_a_rad, error_b_rad);
+      const int manual_axis =
+        this->find_manual_axis(delta_a_rad, delta_b_rad, error_a_rad, error_b_rad);
       if (manual_axis != 0) {
         this->mode_ = (manual_axis > 0) ? Mode::MANUAL_A : Mode::MANUAL_B;
         this->stop_count_ = 0;
@@ -239,12 +242,10 @@ void LinkageController::update(
   // ---------- 8. 输出力矩 ----------
   // PID 输出是统一坐标系下的力矩, 乘回方向符号才对应实际电机;
   // 电机掉线则输出 0
-  const float torque_a = this->motor_a_.is_alive(now_ms)
-                           ? MOTOR_A_DIRECTION_SIGN * this->pid_a_.out
-                           : 0.0f;
-  const float torque_b = this->motor_b_.is_alive(now_ms)
-                           ? MOTOR_B_DIRECTION_SIGN * this->pid_b_.out
-                           : 0.0f;
+  const float torque_a =
+    this->motor_a_.is_alive(now_ms) ? MOTOR_A_DIRECTION_SIGN * this->pid_a_.out : 0.0f;
+  const float torque_b =
+    this->motor_b_.is_alive(now_ms) ? MOTOR_B_DIRECTION_SIGN * this->pid_b_.out : 0.0f;
   this->motor_a_.cmd(torque_a);
   this->motor_b_.cmd(torque_b);
 

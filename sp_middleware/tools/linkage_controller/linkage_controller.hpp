@@ -146,7 +146,7 @@ private:
 
   // ---------- 位置环 PID 参数 ----------
   // 位置环比例增益
-  static constexpr float LOOP_KP = 12.0f;
+  static constexpr float LOOP_KP = 1.0f;
   // 位置环积分增益
   //
   // 取 0: 本模块只靠 P + D 就能把稳态误差压到 0, 不需要积分。
@@ -159,7 +159,7 @@ private:
   //   负载 0.3 N·m 时 KI=0 会被负载拖跑。那时需要同时抬高 LOOP_MAX_INTEGRAL_NM。
   static constexpr float LOOP_KI = 0.0f;
   // 位置环微分增益, 用于提供阻尼
-  static constexpr float LOOP_KD = 0.3f;
+  static constexpr float LOOP_KD = 0.05f;
   // 位置环输出限幅, 单位: N·m
   static constexpr float LOOP_MAX_TORQUE_NM = 1.5f;
   // 位置环积分限幅, 单位: N·m
@@ -170,13 +170,12 @@ private:
   // 稳态时 P 项的量(kp × 允许偏差), 取 kp=12、偏差按 0.1 rad 估 -> 约 1.2 N·m。
   static constexpr float LOOP_MAX_INTEGRAL_NM = 0.0f;
   // 位置环 D 项滤波系数, 越小滤波越强, 1 表示不滤波
-  static constexpr float LOOP_D_FILTER_ALPHA = 0.8f;
+  static constexpr float LOOP_D_FILTER_ALPHA = 0.7f;
   // 位置环积分分离阈值: P 项输出绝对值超过此值时暂停积分, 单位: N·m
   static constexpr float LOOP_INTEGRAL_PAUSE_NM = 0.5f;
   // 是否启用积分。KI 与 MAX_INTEGRAL 必须同时非 0 积分才会工作,
   // 下面用它决定要不要执行"手动期间冻结积分"那段逻辑, 避免死代码
-  static constexpr bool IS_INTEGRAL_ENABLED =
-    (LOOP_KI != 0.0f) && (LOOP_MAX_INTEGRAL_NM != 0.0f);
+  static constexpr bool IS_INTEGRAL_ENABLED = (LOOP_KI != 0.0f) && (LOOP_MAX_INTEGRAL_NM != 0.0f);
 
   // ---------- 主动转动 / 手动转动检测阈值 ----------
   // C 板"静止"判据: yaw 角速度绝对值小于此值认为 C 板未主动转动, 单位: rad/s
