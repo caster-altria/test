@@ -9,6 +9,6 @@ linkage_task 利用ai在sp_middle中间件中添加linkage中间件，
              判断挡位是否有变化之后进行以下行动，
              上档调用linkage.reset进行目标复位，
              下档通过 linkage.disable使目标失能，
-             中档，linkage.init，检测并记录初始角度
+             切换为中档以及在中档切换联动比时调用linkage.init，检测并记录初始角度
              在中档和上档调用linkage.update使用pid向电机输出力矩，其中当c版不转动时转动，由电机偏差及角度增量是否超过阈值以及两电机角度增量大小判断是否为手拧模式以及主动运动方，将变量按比例同步到中间量master_angle，同时改变角度初始偏差量。
              最后设置目标角度target，并且通过pid计算输出力矩。

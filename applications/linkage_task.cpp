@@ -35,6 +35,7 @@ extern "C" void linkage_task()
   // 上一拍的右拨杆档位。用它检测"档位切换"这个事件:
   // 切进联动/复位档位时才需要重建参考, 稳态下每拍只调用 update。
   sp::DBusSwitchMode last_switch = sp::DBusSwitchMode::DOWN;
+  sp::LinkageGear last_gear = sp::LinkageGear::DOWN;
 
   while (true) {
     const uint32_t now_ms = osKernelSysTick();
@@ -62,7 +63,10 @@ extern "C" void linkage_task()
     }
     else if (current_switch == sp::DBusSwitchMode::MID) {
       // 中档: 姿态联动。刚切进来时以当前姿态建立零参考, 避免冲击
-      if (switch_changed) linkage.init(board_yaw_rad);
+      if (switch_changed || gear != last_gear) {
+        linkage.init(board_yaw_rad);
+        last_gear = gear;
+      }
       // board_rate_rad_s 用来判断"C 板是否主动转动", 与手拧电机区分开
       linkage.update(board_yaw_rad, board_rate_rad_s, gear, now_ms);
     }
