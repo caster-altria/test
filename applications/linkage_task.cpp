@@ -72,8 +72,12 @@ extern "C" void linkage_task()
     }
     else {
       // 上档: 复位。刚切进来时重建对齐参考, 之后照常出力保持位置
-      if (switch_changed) linkage.reset(board_yaw_rad);
-      linkage.update(board_yaw_rad, board_rate_rad_s, gear, now_ms);
+      if (switch_changed)
+        for (int i = 0; i < 20; i++) {
+          linkage.reset(board_yaw_rad);
+          linkage.update(board_yaw_rad, board_rate_rad_s, gear, now_ms);
+          osDelay(1);
+        }
     }
 
     osDelay(1);
